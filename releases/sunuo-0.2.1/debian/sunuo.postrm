@@ -1,9 +1,0 @@
-#!/bin/sh -e
-
-if [ "$1" = "remove" ]; then
-    # purge library cache and other stuff
-    rm -rf /var/cache/runuo/lib/*/
-    rm -f /var/lib/sunuo/.wapi/shared*
-fi
-
-#DEBHELPER#
