@@ -1,1 +1,1 @@
-usr/share/sunuo/scripts/legacy.dll usr/share/sunuo/skel/local/lib/legacy.dll
+usr/share/sunuo/scripts/legacy.dll var/lib/sunuo/skel/local/lib/legacy.dll
