@@ -1,2 +1,2 @@
 build-tree/RunUO*/Data/* etc/sunuo/skel
-build-tree/RunUO*/Saves usr/share/sunuo/skel
+build-tree/RunUO*/Saves var/lib/sunuo/skel
