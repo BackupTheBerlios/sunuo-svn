@@ -7,7 +7,7 @@ Build-Depends-Indep: cdbs (>= 0.4.26), debhelper (>= 4.9.1), cli-common (>= 0.1.
 
 Package: sunuo-legacy-scripts
 Architecture: all
-Depends: sunuo (>= 0.2.4)
+Depends: sunuo (>= 0.3.0)
 Description: the basic scripts for SunUO
  SunUO is a free Ultima Online server, based on RunUO.
  .
