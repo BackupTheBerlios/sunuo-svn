@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+# -*- mode: makefile; coding: utf-8 -*-
+
+UPSTREAM_VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f2 -d' ' | cut -f1 -d-)
+DEB_TAR_SRCDIR := sunuo-legacy-scripts-$(UPSTREAM_VERSION)
+DEB_TARBALL := sunuo-legacy-scripts-$(UPSTREAM_VERSION).tar.bz2
+
+# hack for mono+fakeroot
+export MONO_SHARED_DIR = $(HOME)/.wapi
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/tarball.mk
+include /usr/share/cdbs/1/class/makefile.mk
+
+DEB_DH_INSTALL_SOURCEDIR := $(DEB_SRCDIR)
