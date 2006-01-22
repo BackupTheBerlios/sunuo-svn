@@ -1,0 +1,17 @@
+Source: runuo
+Section: non-free/games
+Priority: optional
+Maintainer: Max Kellermann <max@duempel.org>
+Standards-Version: 3.6.1
+Build-Depends-Indep: cdbs (>= 0.4.26), debhelper (>= 4.9.1)
+
+Package: runuo-skeleton
+Architecture: all
+Depends: sunuo (>= 0.2.4)
+Description: skeleton data files for SunUO
+ SunUO is a free Ultima Online server, based on RunUO.
+ .
+ This package installs the RunUO data and save files into the SunUO
+ shard skeleton.
+ .
+ Home page: http://www.sunuo.org/
