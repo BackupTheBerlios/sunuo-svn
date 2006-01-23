@@ -3,7 +3,7 @@ Section: non-free/games
 Priority: optional
 Maintainer: Max Kellermann <max@duempel.org>
 Standards-Version: 3.6.1
-Build-Depends-Indep: cdbs (>= 0.4.26), debhelper (>= 4.9.1), cli-common (>= 0.1.3), mono-mcs (>= 1.1.7)
+Build-Depends-Indep: cdbs (>= 0.4.26), debhelper (>= 4.9.1), cli-common (>= 0.1.3), mono-mcs (>= 1.1.7), sunuo (>= 0.3.0)
 
 Package: sunuo-legacy-scripts
 Architecture: all
