@@ -1,0 +1,438 @@
+/***************************************************************************
+ *                                  Main.cs
+ *                            -------------------
+ *   begin                : May 1, 2002
+ *   copyright            : (C) The RunUO Software Team
+ *                          (C) 2005 Max Kellermann <max@duempel.org>
+ *   email                : max@duempel.org
+ *
+ *   $Id$
+ *   $Author$
+ *   $Date$
+ *
+ *
+ ***************************************************************************/
+
+/***************************************************************************
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+
+using System;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+using System.Reflection;
+using System.Collections;
+using System.Diagnostics;
+using Server;
+using Server.Network;
+using Server.Network.Encryption;
+using Server.Accounting;
+using Server.Gumps;
+
+[assembly: log4net.Config.XmlConfigurator(Watch=true)]
+
+namespace Server
+{
+	public delegate void Slice();
+
+	public class Core
+	{
+		private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+		private static bool m_Crashed;
+		private static Thread timerThread;
+		private static DirectoryInfo m_BaseDirectoryInfo;
+		private static DirectoryInfo m_CacheDirectoryInfo;
+		private static string m_ExePath;
+		private static Assembly m_Assembly;
+		private static Process m_Process;
+		private static Thread m_Thread;
+		private static bool m_Service;
+		private static MultiTextWriter m_MultiConOut = new MultiTextWriter();
+
+		private static Config.Root config;
+
+		private static bool m_Profiling;
+		private static DateTime m_ProfileStart;
+		private static TimeSpan m_ProfileTime;
+
+		private static MessagePump m_MessagePump;
+
+		public static MessagePump MessagePump
+		{
+			get{ return m_MessagePump; }
+			set{ m_MessagePump = value; }
+		}
+
+		public static Slice Slice;
+
+		public static bool Profiling
+		{
+			get{ return m_Profiling; }
+			set
+			{
+				if ( m_Profiling == value )
+					return;
+
+				m_Profiling = value;
+
+				if ( m_ProfileStart > DateTime.MinValue )
+					m_ProfileTime += DateTime.Now - m_ProfileStart;
+
+				m_ProfileStart = ( m_Profiling ? DateTime.Now : DateTime.MinValue );
+			}
+		}
+
+		public static TimeSpan ProfileTime
+		{
+			get
+			{
+				if ( m_ProfileStart > DateTime.MinValue )
+					return m_ProfileTime + (DateTime.Now - m_ProfileStart);
+
+				return m_ProfileTime;
+			}
+		}
+
+		public static bool Service{ get{ return m_Service; } }
+		public static ArrayList DataDirectories {
+			get { return config.DataDirectories; }
+		}
+		public static Assembly Assembly{ get{ return m_Assembly; } set{ m_Assembly = value; } }
+		public static Process Process{ get{ return m_Process; } }
+		public static Thread Thread{ get{ return m_Thread; } }
+		public static MultiTextWriter MultiConsoleOut{ get{ return m_MultiConOut; } }
+
+		private static AutoResetEvent m_Signal = new AutoResetEvent(true);
+		public static void WakeUp() {
+			m_Signal.Set();
+		}
+
+		public static string FindDataFile( string path )
+		{
+			foreach (string dir in config.DataDirectories) {
+				string fullPath = Path.Combine(dir, path);
+
+				if ( File.Exists( fullPath ) )
+					return fullPath;
+			}
+
+			/* workaround for insane filename case */
+			if (path.IndexOf('/') == -1) {
+				string lp = path.ToLower();
+				foreach (string dir in config.DataDirectories) {
+					DirectoryInfo di = new DirectoryInfo(dir);
+					if (!di.Exists)
+						continue;
+
+					foreach (FileInfo fi in di.GetFiles()) {
+						if (fi.Name.ToLower() == lp)
+							return fi.FullName;
+					}
+				}
+			}
+
+			if (log.IsWarnEnabled)
+				log.Warn(String.Format("Warning: data file {0} not found", path));
+			return null;
+		}
+
+		public static string FindDataFile( string format, params object[] args )
+		{
+			return FindDataFile( String.Format( format, args ) );
+		}
+
+		public static bool AOS
+		{
+			get
+			{
+				return Config.Features["age-of-shadows"] || SE;
+			}
+			set
+			{
+				log.Warn("A script attempted to modify Core.AOS - please configure that option in etc/sunuo.xml instead");
+			}
+		}
+
+		public static bool SE
+		{
+			get
+			{
+				return Config.Features["samurai-empire"];
+			}
+			set
+			{
+				log.Warn("A script attempted to modify Core.SE - please configure that option in etc/sunuo.xml instead");
+			}
+		}
+
+		public static string ExePath
+		{
+			get
+			{
+				if ( m_ExePath == null )
+					m_ExePath = Process.GetCurrentProcess().MainModule.FileName;
+
+				return m_ExePath;
+			}
+		}
+
+		public static string BaseDirectory
+		{
+			get
+			{
+				return Config.BaseDirectory;
+			}
+		}
+
+		public static DirectoryInfo BaseDirectoryInfo {
+			get {
+				if (m_BaseDirectoryInfo == null)
+					m_BaseDirectoryInfo = new DirectoryInfo(BaseDirectory);
+
+				return m_BaseDirectoryInfo;
+			}
+		}
+
+		public static DirectoryInfo LocalDirectoryInfo {
+			get {
+				return BaseDirectoryInfo
+					.CreateSubdirectory("local");
+			}
+		}
+
+		public static DirectoryInfo LogDirectoryInfo {
+			get {
+				return BaseDirectoryInfo
+					.CreateSubdirectory("var")
+					.CreateSubdirectory("log");
+			}
+		}
+
+		public static DirectoryInfo CacheDirectoryInfo {
+			get {
+				if (m_CacheDirectoryInfo == null)
+					m_CacheDirectoryInfo = BaseDirectoryInfo
+						.CreateSubdirectory("var")
+						.CreateSubdirectory("cache");
+
+				return m_CacheDirectoryInfo;
+			}
+		}
+
+		public static Config.Root Config {
+			get { return config; }
+		}
+
+		private static DateTime m_Now = DateTime.Now;
+		public static DateTime Now {
+			get {
+				return m_Now;
+			}
+		}
+
+		private static void CurrentDomain_UnhandledException( object sender, UnhandledExceptionEventArgs e )
+		{
+			log.Fatal(e.ExceptionObject);
+
+			if ( e.IsTerminating )
+			{
+				m_Crashed = true;
+
+				bool close = false;
+
+				try
+				{
+					CrashedEventArgs args = new CrashedEventArgs( e.ExceptionObject as Exception );
+
+					EventSink.InvokeCrashed( args );
+
+					close = args.Close;
+				}
+				catch
+				{
+				}
+
+				if ( !close && !m_Service )
+				{
+					Console.WriteLine( "This exception is fatal, press return to exit" );
+					Console.ReadLine();
+				}
+
+				m_Closing = true;
+			}
+		}
+
+		private static void CurrentDomain_ProcessExit( object sender, EventArgs e )
+		{
+			HandleClosed();
+		}
+
+		private static bool m_Closing;
+
+		public static bool Closing{ get{ return m_Closing; } set{ m_Closing = value; } }
+
+		private static void HandleClosed()
+		{
+			if ( m_Closing )
+				return;
+
+			m_Closing = true;
+
+			log.Info( "Exiting..." );
+
+			if ( !m_Crashed )
+				EventSink.InvokeShutdown( new ShutdownEventArgs() );
+
+			timerThread.Join();
+			log.Info( "done" );
+		}
+
+		public static void Start(Config.Root _config, bool debug, bool _service, bool _profiling) {
+			config = _config;
+			m_Service = _service;
+			Profiling = _profiling;
+
+			m_Assembly = Assembly.GetEntryAssembly();
+
+			/* prepare SunUO */
+			AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler( CurrentDomain_UnhandledException );
+			AppDomain.CurrentDomain.ProcessExit += new EventHandler( CurrentDomain_ProcessExit );
+
+			/* redirect Console to file in service mode */
+			if (m_Service) {
+				string filename = Path.Combine(LogDirectoryInfo.FullName, "console.log");
+				FileStream stream = new FileStream(filename, FileMode.Create,
+												   FileAccess.Write, FileShare.Read);
+				StreamWriter writer = new StreamWriter(stream);
+				Console.SetOut(writer);
+				Console.SetError(writer);
+			}
+
+			m_Thread = Thread.CurrentThread;
+			m_Process = Process.GetCurrentProcess();
+
+			if ( m_Thread != null )
+				m_Thread.Name = "Core Thread";
+
+			if ( BaseDirectory.Length > 0 )
+				Directory.SetCurrentDirectory( BaseDirectory );
+
+			Timer.TimerThread ttObj = new Timer.TimerThread();
+			timerThread = new Thread( new ThreadStart( ttObj.TimerMain ) );
+			timerThread.Name = "Timer Thread";
+
+			if (!ScriptCompiler.Compile(debug))
+				return;
+
+			m_ItemCount = 0;
+			m_MobileCount = 0;
+			foreach (Library l in ScriptCompiler.Libraries) {
+				int itemCount = 0, mobileCount = 0;
+				l.Verify(ref itemCount, ref mobileCount);
+				log.Info(String.Format("Library {0} verified: {1} items, {2} mobiles",
+									   l.Name, itemCount, mobileCount));
+				m_ItemCount += itemCount;
+				m_MobileCount += mobileCount;
+			}
+			log.Info(String.Format("All libraries verified: {0} items, {1} mobiles)",
+								   m_ItemCount, m_MobileCount));
+
+			try {
+				ScriptCompiler.Configure();
+			} catch (TargetInvocationException e) {
+				log.Fatal("Configure exception: {0}", e.InnerException);
+				return;
+			}
+
+			if (!config.Exists)
+				config.Save();
+
+			World.Load();
+
+			try {
+				ScriptCompiler.Initialize();
+			} catch (TargetInvocationException e) {
+				log.Fatal("Initialize exception: {0}", e.InnerException);
+				return;
+			}
+
+			Region.Load();
+
+			m_MessagePump = new MessagePump( new Listener( Listener.Port ) );
+
+			timerThread.Start();
+
+			NetState.Initialize();
+			Encryption.Initialize();
+
+			EventSink.InvokeServerStarted();
+
+			log.Info("SunUO initialized, entering main loop");
+
+			try
+			{
+				while ( !m_Closing )
+				{
+					m_Signal.WaitOne();
+
+					m_Now = DateTime.Now;
+
+					Mobile.ProcessDeltaQueue();
+					Item.ProcessDeltaQueue();
+
+					Timer.Slice();
+					m_MessagePump.Slice();
+
+					NetState.FlushAll();
+					NetState.ProcessDisposedQueue();
+
+					if ( Slice != null )
+						Slice();
+				}
+			}
+			catch ( Exception e )
+			{
+				CurrentDomain_UnhandledException( null, new UnhandledExceptionEventArgs( e, true ) );
+			}
+
+			if ( timerThread.IsAlive )
+				timerThread.Abort();
+		}
+
+		private static int m_GlobalMaxUpdateRange = 24;
+
+		public static int GlobalMaxUpdateRange
+		{
+			get{ return m_GlobalMaxUpdateRange; }
+			set{ m_GlobalMaxUpdateRange = value; }
+		}
+
+		private static int m_ItemCount, m_MobileCount;
+
+		public static int ScriptItems { get { return m_ItemCount; } }
+		public static int ScriptMobiles { get { return m_MobileCount; } }
+	}
+
+	public class MultiTextWriter
+	{
+		public MultiTextWriter()
+		{
+		}
+
+		public void Add( TextWriter tw )
+		{
+		}
+
+		public void Remove( TextWriter tw )
+		{
+		}
+	}
+}
