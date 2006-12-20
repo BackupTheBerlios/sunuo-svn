@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- This is the SunUO configuration file. http://www.sunuo.org/ -->
+
+<sunuo-config>
+  <locations>
+    <!--the element 'data-path' sets the UO client directory-->
+    <data-path>/opt/games/uo</data-path>
+  </locations>
+  <libraries>
+    <library name="legacy">
+      <!--
+      <ignore-source name="Misc/ZLib.cs" />
+      -->
+    </library>
+    <library name="myrunuo" disabled="yes" />
+    <library name="remote-admin" disabled="yes" />
+    <library name="reports" disabled="yes" />
+  </libraries>
+  <login>
+    <ignore-auth-id value="off" />
+  </login>
+  <global>
+    <multi-threading value="off" />
+    <feature name="manual-gc" />
+    <!--<feature name="multi-threading" />-->
+    <!--<feature name="age-of-shadows" />-->
+  </global>
+  <network>
+    <bind port="2593"/>
+    <!--
+    <bind address="1.2.3.4" port="2594"/>
+    -->
+  </network>
+</sunuo-config>
