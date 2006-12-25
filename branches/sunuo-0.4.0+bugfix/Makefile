@@ -45,6 +45,7 @@ LOG4NET_DEPS := build/log4net.dll
 endif
 
 ifeq ($(PORTABLE),1)
+W32_ZLIB_DLL = lib/w32/zlib.dll
 DIST_FILES += bin/w32/SunUO.exe bin/w32/zlib.dll
 endif
 
@@ -191,10 +192,12 @@ svn-export:
 	@mkdir -p build/tmp
 	svn export . build/tmp/sunuo-$(VERSION)-src
 
-build/dist/sunuo-$(VERSION)-src.zip: svn-export
+build/dist/sunuo-$(VERSION)-src.zip: svn-export $(W32_ZLIB_DLL)
 	@mkdir -p build/tmp/sunuo-$(VERSION)-src/lib/w32
 	cp $(addprefix lib/,$(DISTDLL)) build/tmp/sunuo-$(VERSION)-src/lib/
+ifeq ($(PORTABLE),1)
 	cp lib/w32/zlib.dll build/tmp/sunuo-$(VERSION)-src/lib/w32/
+endif
 	@mkdir -p $(dir $@)
 	cd build/tmp && fakeroot zip -q -r $(shell pwd)/$@ sunuo-$(VERSION)-src
 	@rm -rf build/tmp
