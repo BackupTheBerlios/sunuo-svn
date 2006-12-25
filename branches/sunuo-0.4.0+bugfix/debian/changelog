@@ -4,7 +4,7 @@ sunuo (0.4.1) unstable; urgency=low
   * fixed account database corruption bug
   * show correct client number in disconnect message
 
- --
+ -- Max Kellermann <max@duempel.org>  Mon, 25 Dec 2006 01:46:23 +0100
 
 sunuo (0.4.0) unstable; urgency=low
 
