@@ -1,6 +1,7 @@
 sunuo (0.4.1) unstable; urgency=low
 
   * lock m_Accounts in Accounting.Accounts
+  * fixed account database corruption bug
 
  --
 

@@ -171,10 +171,15 @@ namespace Server.Accounting
 			XmlDocument doc = new XmlDocument();
 			XmlReader reader = new XmlTextReader(filePath);
 
-			while (reader.Read()) {
+			reader.Read();
+			while (true) {
 				if (reader.NodeType != XmlNodeType.Element ||
-					reader.Name != "account")
-					continue;
+					reader.Name != "account") {
+					if (reader.Read())
+						continue;
+					else
+						break;
+				}
 
 				XmlElement account = (XmlElement)doc.ReadNode(reader);
 
