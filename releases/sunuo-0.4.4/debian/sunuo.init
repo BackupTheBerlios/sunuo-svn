@@ -1,0 +1,67 @@
+#! /bin/sh
+#
+# sunuo init script
+#
+# Author:        Max Kellermann <max@duempel.org>
+#
+
+set -e
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DESC="SunUO"
+NAME=sunuo
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+test -x /usr/share/sunuo/SunUO.exe || exit 0
+
+AUTO_SHARDS=""
+
+# Read config file if it is present.
+if [ -r /etc/default/$NAME ]
+then
+        . /etc/default/$NAME
+fi
+
+#
+# Function that starts the daemon/service.
+#
+d_start() {
+    /usr/sbin/sunuo-control start $AUTO_SHARDS
+}
+
+#
+# Function that stops the daemon/service.
+#
+d_stop() {
+    /usr/sbin/sunuo-control stop $AUTO_SHARDS
+}
+
+case "$1" in
+  start)
+        test -z "$AUTO_SHARDS" && exit 0
+        echo -n "Starting $DESC: $NAME"
+        d_start
+        echo "."
+        ;;
+  stop)
+        echo -n "Stopping $DESC: $NAME"
+        d_stop
+        echo "."
+        ;;
+  restart|force-reload)
+        test -z "$AUTO_SHARDS" && exit 0
+        echo -n "Restarting $DESC: $NAME"
+        d_stop
+        sleep 1
+        d_start
+        echo "."
+        ;;
+  *)
+        # echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
+        echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
