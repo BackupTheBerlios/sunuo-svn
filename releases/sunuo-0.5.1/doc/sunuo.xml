@@ -1,0 +1,1022 @@
+<?xml version='1.0' encoding="utf-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+               "docbook/dtd/xml/4.2/docbookx.dtd">
+<book>
+  <title>SunUO</title>
+
+  <bookinfo>
+    <author>
+      <firstname>Max</firstname>
+      <surname>Kellermann</surname>
+      <email>max@duempel.org</email>
+    </author>
+  </bookinfo>
+
+  <preface id="preface">
+    <title>
+      What is SunUO?
+    </title>
+    <para>
+      <ulink
+        url="http://www.sunuo.org/">SunUO</ulink>
+        is a free <ulink url="http://www.uo.com/">Ultima
+        Online</ulink> server for Linux/Mono and Windows.NET, based on
+        <ulink url="http://www.runuo.com/">RunUO</ulink>.
+    </para>
+  </preface>
+
+  <chapter id="installation">
+    <title>Installation</title>
+    <section id="requirements">
+      <title>Requirements</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            512 MB memory for a small shard
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Microsoft .NET or <ulink
+              url="http://www.mono-project.org/">Mono 1.2</ulink>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            an Ultima Online client
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <ulink url="http://www.sunuo.org/">SunUO binary
+              distribution</ulink>
+          </para>
+        </listitem>
+      </itemizedlist>
+
+      <para>
+        Experience has shown that CPU power is not that important.
+        Even a huge shard will not load a consumer-grade Pentium IV
+        more than 10%.  Memory is much more important; for a big
+        shard, you should consider using a 64 bit operating system,
+        since you cannot make a process larger than 3 GB with a 32 bit
+        operating system.  A quick hard disk can accelerate world
+        saves.
+      </para>
+    </section>
+
+    <section id="installing_mono">
+      <title>Installing Mono</title>
+      <para>
+        SunUO requires a .NET 1.1 runtime.  On Windows, you can get
+        Microsoft's .NET Framework via Windows Update.  On other
+        operating systems like Linux, you have to use Mono instead;
+        please use the most recent version available.  Most current
+        Linux distributions come with Mono nowadays.  On Debian Etch,
+        the following procedure will install Mono:
+      </para>
+      <programlisting>apt-get install mono mono-mcs libmono-winforms1.0-cil</programlisting>
+      <para>
+        I have been told that you can do the following on Fedora:
+      </para>
+      <programlisting>yum install mono</programlisting>
+      <para>
+        Also ensure that the Mono C# Compiler
+        (<filename>mcs</filename>) is installed, SunUO needs it to
+        compile scripts.
+      </para>
+    </section>
+
+    <section id="uo_data_files">
+      <title>Installing the UO data files</title>
+      <para>
+        SunUO uses the data files from the original Ultima Online to
+        calculate its world.  Copy the whole UO directory to your
+        SunUO server, e.g. <filename>/opt/games/uo</filename>.  On
+        Windows, SunUO should be able auto-detect an UO client.
+      </para>
+    </section>
+
+    <section id="installing_new_server">
+      <title>Installing a new server</title>
+
+      <para>
+        Unzip the SunUO binary zip file.
+      </para>
+
+      <para>
+        Edit the file <filename>conf/sunuo.xml</filename> and set your
+        preferences.  You might want to set the location of the UO
+        client (<link linkend="config_data_path">element <varname>data-path</varname></link>).
+      </para>
+
+      <para>
+        If everything is set up, you can start your new SunUO server
+        by running <filename>run.bat</filename> or
+        <filename>run64.bat</filename> (Windows 32/64 bit) or
+        <filename>./run.sh</filename> (all other operating systems,
+        including Linux).
+      </para>
+
+      <para>
+        If you have got less than 512 MB of physical memory or a slow
+        CPU, the first script compilation can take 15 minutes or
+        longer.
+      </para>
+
+      <para>
+        The first account created gets administrator privileges.
+        Therefore make sure that auto-accounting is enabled during
+        installation.
+      </para>
+    </section>
+
+    <section id="migrating_from_runuo">
+      <title>Upgrading a shard from RunUO</title>
+      <important>
+        <para>
+          Don't forget to back up your old server!
+        </para>
+      </important>
+      <orderedlist>
+        <listitem>
+          <para>
+            Shut down RunUO.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Unpack the SunUO binary zip file somewhere, and copy all
+            files from the base directory plus the
+            <filename>etc</filename> and <filename>bin</filename>
+            directory into the old RunUO directory.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Read the section <link
+            linkend="working_around_runuo_bugs">Working around RunUO
+            bugs</link> carefully.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Start SunUO by running <filename>run.bat</filename> (Windows) or
+            <filename>./run.sh</filename> (all other operating systems,
+            including Linux).
+          </para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section id="compiling">
+      <title>Compiling SunUO from the sources</title>
+      <para>
+        If you are on Unix with Mono, edit the file config.mk and
+        change the paths. Then type:
+      </para>
+      <programlisting>make</programlisting>
+      <para>
+        Note that the resulting executable does not work on Windows. I
+        am yet unsure if this is a Mono MCS bug or a Microsoft.NET
+        bug. On windows, run the file
+        <filename>compile.bat</filename>. If that does not work, edit
+        <filename>compile.bat</filename> and check if the "csc.exe"
+        location is correct. The executable compiled on Windows also
+        runs on Mono.
+      </para>
+    </section>
+  </chapter>
+
+  <chapter id="upgrading">
+    <title>Upgrading</title>
+
+    <important>
+      <para>
+        Don't forget to back up your old server!
+      </para>
+    </important>
+
+    <orderedlist>
+      <listitem>
+        <para>
+          Shut down SunUO.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Delete <filename>SunUO.exe</filename> and the directory
+          <filename>bin</filename>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Unpack the SunUO binary zip file somewhere.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Copy the files <filename>run*.bat</filename>,
+          <filename>run.sh</filename> and the directory
+          <filename>bin</filename> to your SunUO base directory.  You
+          should also copy the external libraries
+          (<filename>*.dll</filename>).
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Start SunUO by running <filename>run.bat</filename> or
+          <filename>run64.bat</filename> (Windows 32/64 bit) or
+          <filename>./run.sh</filename> (all other operating systems,
+          including Linux).
+        </para>
+      </listitem>
+    </orderedlist>
+
+    <para>
+      The rest of this chapter describes other actions required for a
+      smooth upgrade.
+    </para>
+
+    <section id="upgrading_to_0_5_0">
+      <title>Upgrading to 0.5.0</title>
+      <para>
+        SunUO 0.5.0 adds support for the UO client version 6.  This
+        patch requires several script changes.  The following scripts
+        have been changed for this:
+      </para>
+
+      <programlisting>Items/Misc/BulletinBoards.cs
+Items/Skill Items/Magical/Spellbook.cs
+Mobiles/Vendors/BaseVendor.cs</programlisting>
+    </section>
+
+    <section id="upgrading_to_0_3_0">
+      <title>Upgrading to 0.3.0</title>
+      <para>
+        The <filename>ZLib.cs</filename> workaround was removed from
+        the core; instead of excluding that script from compilation,
+        overwrite it with the version shipped with SunUO.
+      </para>
+
+      <para>
+        <varname>Core.AOS</varname> is disabled by default.  Enable
+        the <link linkend="feature_aos">feature
+        <varname>age-of-shadows</varname></link> instead.
+      </para>
+    </section>
+  </chapter>
+
+  <chapter id="configuration">
+    <title>Configuration</title>
+    <section id="config_basics">
+      <title>Basics</title>
+      <para>
+        In RunUO, much of the configuration is done by editing the
+        <filename>./Scripts/</filename> source codes. That makes
+        upgrading a nightmare. SunUO tries to put as much as possible
+        into the file <filename>./etc/sunuo.xml</filename>, although
+        this is limited currently, because compatibility with RunUO is
+        important. SunUO creates this file on its first run.
+      </para>
+
+      <section id="config_data_path">
+        <title>UO client directory</title>
+        <para>
+          You have to tell SunUO where you have installed the UO
+          client.  Enter the absolute path in the element
+          <varname>data-path</varname>:
+        </para>
+
+        <programlisting>&lt;sunuo-config&gt;
+  &lt;locations&gt;
+    &lt;data-path&gt;/usr/local/games/uo&lt;/data-path&gt;
+  &lt;/locations&gt;
+&lt;/sunuo-config&gt;</programlisting>
+      </section>
+
+      <section id="config_net">
+        <title>Networking</title>
+
+        <para>
+          In the <varname>network</varname> section, you can configure
+          which ports SunUO listens on:
+        </para>
+
+        <programlisting>&lt;sunuo-config&gt;
+  &lt;network&gt;
+    &lt;bind address="127.0.0.1" port="2593"/&gt;
+    &lt;bind port="2594"/&gt;
+  &lt;/network&gt;
+&lt;/sunuo-config&gt;</programlisting>
+
+        <para>
+          If you have more than one public IP, you can bind several
+          SunUO instances on the same port, but on different IPs.
+        </para>
+
+        <para>
+          If you omit the <varname>address</varname> attribute, SunUO
+          listens on all interfaces.  The default port is 2593.  When
+          no <varname>bind</varname> configuration is present at all,
+          SunUO creates one listener which binds to all interfaces on
+          port 2593.
+        </para>
+      </section>
+
+      <section id="config_serverlist">
+        <title>Server list</title>
+
+        <para>
+          The default server list only includes this one server
+          itself.  To create a custom server list, add a
+          <varname>server-list</varname> section:
+        </para>
+
+        <programlisting>&lt;sunuo-config&gt;
+  &lt;server-list&gt;
+    &lt;game-server&gt;
+      &lt;name&gt;Our first server&lt;/name&gt;
+      &lt;address&gt;1.2.3.4:2593&lt;/address&gt;
+    &lt;/game-server&gt;
+    &lt;game-server&gt;
+      &lt;name&gt;The second server&lt;/name&gt;
+      &lt;address&gt;5.6.7.8:2594&lt;/address&gt;
+    &lt;/game-server&gt;
+  &lt;/server-list&gt;
+&lt;/sunuo-config&gt;</programlisting>
+      </section>
+
+      <section id="config_features">
+        <title>Features</title>
+        <para>
+          The "feature" element is used by SunUO to enable features in
+          the core, and possibly in scripts.  Unknown feature
+          specifications are ignored.  Example:
+        </para>
+
+        <programlisting>&lt;sunuo-config&gt;
+  &lt;global&gt;
+    &lt;feature name="disable-context-menus"/&gt;
+    &lt;feature name="prefer-ascii"/&gt;
+    &lt;feature name="delocalize"/&gt;
+  &lt;/global&gt;
+&lt;/sunuo-config&gt;</programlisting>
+
+        <para>
+          The following feature flags are currently recognized by the
+          SunUO core:
+        </para>
+
+        <table id="feature_flags">
+          <title>Feature flags</title>
+          <tgroup cols="2">
+            <thead>
+              <row>
+                <entry>Name</entry>
+                <entry>Description</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>multi-threading</entry>
+                <entry>
+                  enable the multi threaded world save; this gives a
+                  significant speed boost if you have more than one
+                  CPU core
+                </entry>
+              </row>
+              <row>
+                <entry>manual-gc</entry>
+                <entry>
+                  run the CLI's garbage collector manually after world
+                  load and world save; this is recommended for Mono's
+                  non-generational GC
+                </entry>
+              </row>
+              <row>
+                <entry>quick-local-connect</entry>
+                <entry>
+                  do not use two separate connections for login and
+                  game play.  As a side effect due to a protocol
+                  limitation, compression is permanently disabled.
+                  Enable this feature if your SunUO server is behind a
+                  DNAT gateway.  The game server should be configured
+                  with its internal IP.
+                </entry>
+              </row>
+              <row>
+                <entry>disable-tile-patch</entry>
+                <entry>
+                  don't load <filename>mapdif*.mul</filename>,
+                  <filename>stadif*.mul</filename>
+                </entry>
+              </row>
+              <row>
+                <entry>disable-context-menus</entry>
+                <entry>
+                  disable the client's context menus
+                </entry>
+              </row>
+              <row>
+                <entry>prefer-ascii</entry>
+                <entry>
+                  prefer ASCII over Unicode messages whenever possible
+                </entry>
+              </row>
+              <row>
+                <entry>delocalize</entry>
+                <entry>
+                  don't send localized messages to the client
+                </entry>
+              </row>
+              <row>
+                <entry>age-of-shadows</entry>
+                <entry>
+                  <anchor id="feature_aos"/>
+                  enable AOS features (set <varname>Core.AOS</varname>)
+                </entry>
+              </row>
+              <row>
+                <entry>samurai-empire</entry>
+                <entry>
+                  enable SE features (set <varname>Core.SE</varname>)
+                </entry>
+              </row>
+              <row>
+                <entry>test-center</entry>
+                <entry>
+                  enable test center rules, i.e. players can set stats
+                  and skills with the "set" command
+                </entry>
+              </row>
+              <row>
+                <entry>allow-docgen</entry>
+                <entry>
+                  enable the [docgen command
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </section>
+
+      <section id="config_accounting">
+        <title>Accounting</title>
+
+        <section id="auto_create_accounts">
+          <title>Disable auto-accounting</title>
+
+          <para>
+            By default, everybody can create new accounts by just
+            typing a new user name at login.  To disable this,
+            configure:
+          </para>
+
+          <programlisting>&lt;sunuo-config&gt;
+  &lt;login&gt;
+    &lt;auto-create-accounts value="no"/&gt;
+  &lt;/login&gt;
+&lt;/sunuo-config&gt;</programlisting>
+        </section>
+
+        <section id="max_logins_per_ip">
+          <title>Limit number of logins per IP</title>
+
+          <programlisting>&lt;sunuo-config&gt;
+  &lt;login&gt;
+    &lt;max-logins-per-ip value="2"/&gt;
+  &lt;/login&gt;
+&lt;/sunuo-config&gt;</programlisting>
+        </section>
+
+        <section id="max_created_accounts_per_ip">
+          <title>Limit number of account creations per IP</title>
+
+          <programlisting>&lt;sunuo-config&gt;
+  &lt;login&gt;
+    &lt;max-created-accounts-per-ip value="1"/&gt;
+  &lt;/login&gt;
+&lt;/sunuo-config&gt;</programlisting>
+        </section>
+
+        <section id="max_chars_per_account">
+          <title>Limit number of characters a user can create</title>
+
+          <programlisting>&lt;sunuo-config&gt;
+  &lt;login&gt;
+    &lt;max-chars-per-account value="3"/&gt;
+  &lt;/login&gt;
+&lt;/sunuo-config&gt;</programlisting>
+        </section>
+      </section>
+
+      <section id="config_autosave">
+        <title>Automatic saving</title>
+        <para>
+          By default, SunUO saves the world every 15 minutes.  You can
+          customize this setting; the following example saves every 60
+          minutes:
+        </para>
+
+        <programlisting>&lt;sunuo-config&gt;
+  &lt;global&gt;
+    &lt;save-interval&gt;60&lt;/save-interval/&gt;
+  &lt;/global&gt;
+&lt;/sunuo-config&gt;</programlisting>
+      </section>
+
+      <section id="config_encryption">
+        <title>Encryption</title>
+        <para>
+          Starting with version 0.2.0, SunUO has out-of-the-box
+          support for encrypted clients, dropping the need to disable
+          encryption in all clients.
+        </para>
+
+        <para>
+          The element <varname>&lt;encryption&gt;</varname> in
+          <filename>etc/sunuo.xml</filename> is responsible for
+          configuration:
+        </para>
+
+        <programlisting>&lt;sunuo-config&gt;
+  &lt;encryption&gt;
+    &lt;enabled value="yes"/&gt;
+    &lt;allow-unencrypted value="no"/&gt;
+    &lt;login-key name="6.5.4" key1="0xdeadbeef" key2="0xbeefdead"/&gt;
+  &lt;/encryption&gt;
+&lt;/sunuo-config&gt;</programlisting>
+
+        <para>
+          The variable <varname>enabled</varname> enables or disables
+          the encryption code.  By modifying
+          <varname>allow-unencrypted</varname>, you may command SunUO
+          to reject all clients without encryption.
+        </para>
+
+        <para>
+          Optionally, you may specify additional login keys with
+          <varname>login-key</varname>, one element per key.  A
+          number of those is already hard-coded in the sources.
+        </para>
+      </section>
+    </section>
+
+    <section id="config_tricks">
+      <title>Tricks</title>
+
+      <section id="login_server">
+        <title>Separating login server from shard server</title>
+        <para>
+          To make SunUO ignore the AuthID, configure:
+        </para>
+        <programlisting>&lt;sunuo-config&gt;
+  &lt;login&gt;
+    &lt;ignore-auth-id value="on"/&gt;
+  &lt;/login&gt;
+&lt;/sunuo-config&gt;</programlisting>
+        <para>
+          This allows you to run the login server and the shard server
+          on different machines. This is safe, because both check the
+          password independently. It is however important that the
+          account databases on both servers are the same.
+        </para>
+      </section>
+
+      <section id="dnat">
+        <title>SunUO behind a NATted private network</title>
+
+        <para>
+          If your SunUO server has a private IP address and it is
+          being accessed via DNAT (sometimes called "port
+          forwarding"), the default server list is incorrect.  In this
+          case, you have to explicitly specify a custom server list
+          (as <link linkend="config_serverlist">described
+          above</link>):
+        </para>
+
+        <programlisting>&lt;sunuo-config&gt;
+  &lt;server-list&gt;
+    &lt;game-server&gt;
+      &lt;name&gt;DSL shard&lt;/name&gt;
+      &lt;address&gt;dsl-shard.dyndns.org&lt;/address&gt;
+    &lt;/game-server&gt;
+  &lt;/server-list&gt;
+&lt;/sunuo-config&gt;</programlisting>
+
+        <para>
+          Note that SunUO resolves the host name during server bootup,
+          so if you have a dynamic IP, you probably have to restart
+          the shard after every DSL reconnect.
+        </para>
+      </section>
+    </section>
+
+    <section id="runuo_bugs">
+      <title>Working around RunUO bugs</title>
+      <anchor id="working_around_runuo_bugs"/>
+      <para>
+        Many of the original RunUO scripts are written in a
+        non-portable way, or just buggy.  This section is a collection
+        of workarounds.  You do not need to read this section if you
+        did not upgrade from RunUO, since the SunUO scripts have been
+        corrected.
+      </para>
+
+      <section id="bugged_restart">
+        <title>Making <command>[restart</command> work</title>
+        <para>
+          On Unix / Linux, server restart does not work. This is
+          because .NET assemblies cannot be run directly, you have to
+          call the "<filename>mono</filename>" wrapper ("mono
+          SunUO.exe"), unless you have
+          <filename>BINFMT_MISC</filename> configured correctly, but
+          that's a solution for the Linux wizards.
+        </para>
+        <para>
+          Solution: edit the following files:
+        </para>
+        <programlisting>./Scripts/Misc/CrashGuard.cs
+./Scripts/Misc/AutoRestart.cs
+./Scripts/Gumps/AdminGump.cs</programlisting>
+        <para>
+          And replace:
+        </para>
+        <programlisting>Process.Start( Core.ExePath );</programlisting>
+        <para>
+          by:
+        </para>
+        <programlisting>Process.Start( "mono", Core.ExePath );</programlisting>
+      </section>
+
+      <section id="bugged_restart_binfmt_misc">
+        <title>Making <command>[restart</command> work with <filename>BINFMT_MISC</filename></title>
+        <para>
+          If your linux kernel supports
+          <filename>BINFMT_MISC</filename> (check if the file
+          /proc/sys/fs/binfmt_misc/register exists), you don't need to
+          edit scripts. The following command activates
+          <filename>BINFMT_MISC</filename> for Mono:
+        </para>
+        <programlisting>echo ':CLR:M::MZ::/usr/local/bin/mono:' > /proc/sys/fs/binfmt_misc/register</programlisting>
+        <para>
+          You may have to change the path to the mono binary. You
+          should add this command to your startup scripts, because the
+          change is gone after a reboot.
+        </para>
+      </section>
+
+      <section id="custom_houses">
+        <title>Customized houses</title>
+        <para>
+          RunUO imports code from <filename>zlib.dll</filename> on
+          windows.  This is done in a non-portable way.  To fix this,
+          overwrite overwrite the file
+          <filename>Scripts/Misc/ZLib.cs</filename> with the version
+          shipped with SunUO.
+        </para>
+      </section>
+
+      <section id="gdiplus_crash">
+        <title>GDIPlus related crashes</title>
+        <para>
+          On many Mono installations, <filename>libgdiplus</filename>
+          is not properly installed. That means that the Reports
+          engine will crash the server. As a workaround, you should
+          turn off the Reports:
+        </para>
+        <programlisting>&lt;libraries&gt;
+  &lt;library name="legacy"&gt;
+    &lt;ignore-type name="Server.Engines.Reports.Reports"/&gt;
+  &lt;/library&gt;
+&lt;/libraries&gt;</programlisting>
+      </section>
+
+      <section id="faction_direntry_order">
+        <title>The RunUO faction direntry order bug</title>
+        <para>
+          I reported a bug to the RunUO bug tracker:
+        </para>
+        <para>
+          <ulink
+            url="http://www.runuo.com/bugs/bug_view_page.php?bug_id=0000304"></ulink>
+        </para>
+        <para>
+          Basically, Reflector.cs in the faction scripts assumes that
+          types in an assembly are sorted alphabetically, and uses
+          array indices as an identification for factions and faction
+          towns. These are broken when the order of source code on the
+          hard disk changes, which can happen for many reasons
+          (editing with an editor creating backup files).
+        </para>
+        <para>
+          SunUO 0.1.4 introduced a workaround which sorts the list of
+          file names before passing them to the compiler. Note that
+          this is only a hack; you simply must not make any
+          assumptions on the order of file names on the hard disk.
+        </para>
+      </section>
+
+      <section id="arya_auction">
+        <title>Arya's auction</title>
+        <para>
+          Arya's auction was released in the <ulink
+          url="http://www.runuo.com/forum/showthread.php?t=37483&amp;page=1">RunUO
+          forum</ulink>. It is, unfortunately, yet another bugged
+          script library. The following instructions work around these
+          problems:
+        </para>
+        <orderedlist>
+          <listitem>
+            <para>
+              download the file <ulink
+                url="http://www.runuo.com/forum/attachment.php?attachmentid=4447"><filename>Auction.1.7.9.zip</filename></ulink>
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              unzip it in the script library directory:
+            </para>
+            <programlisting>cd local/src
+unzip /tmp/Auction.1.7.9.zip</programlisting>
+            <para>
+              This will create the directory
+              <filename>./local/src/Auction/</filename>.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              the file
+              <filename>./local/src/Auction/AuctionItem.cs</filename>
+              is in an invalid text file format which confuses the
+              Mono C# compiler; fix that:
+            </para>
+            <programlisting>perl -pi -e 's,\r\n,\n,gs' local/src/Auction/AuctionItem.cs
+perl -pi -e 's,\r,\n,gs' local/src/Auction/AuctionItem.cs</programlisting>
+          </listitem>
+          <listitem>
+            <para>
+              the ZIP file ships the closed-source library
+              <filename>Ultima.dll</filename>; install this file as a
+              binary script library:
+            </para>
+            <programlisting>mv local/src/Auction/Ultima.dll local/lib/</programlisting>
+            <para>
+              Now set a dependency to enforce the correct loading
+              order:
+            </para>
+            <programlisting>&lt;libraries&gt;
+  &lt;library name="Auction"&gt;
+    &lt;depends name="Ultima"/&gt;
+  &lt;/library&gt;
+&lt;/libraries&gt;</programlisting>
+          </listitem>
+          <listitem>
+            <para>
+              Arya's code uses the type <type>IUsesRemaining</type>,
+              which is not marked as "public". Edit the file
+              <filename>./Scripts/Items/Skill Items/Harvest
+              Tools/BaseHarvestTool.cs</filename> and make the
+              interface public:
+            </para>
+            <programlisting>public interface IUsesRemaining</programlisting>
+          </listitem>
+        </orderedlist>
+      </section>
+    </section>
+
+    <section id="logging">
+      <title>Logging</title>
+      <para>
+        SunUO includes the <ulink
+        url="http://logging.apache.org/log4net/release/features.html"><filename>log4net</filename></ulink>
+        library, which is a very flexible library for logging.  SunUO
+        provides a good default configuration, which should be enough
+        for most cases.  If you want to do more, please refer to the
+        <ulink
+        url="http://logging.apache.org/log4net/release/config-examples.html">examples</ulink>
+        section on the <filename>log4net</filename> home page.
+      </para>
+
+      <para>
+        For scripts authors, the use of <filename>log4net</filename>
+        is very easy.  Add the following declaration at the top of
+        each class body:
+      </para>
+
+      <programlisting>private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);</programlisting>
+
+      <para>
+        Now in your code, you may replace
+        <command>Console.WriteLine()</command> with method calls to
+        this <varname>log</varname> object.  The following example
+        demonstrates some of these:
+      </para>
+
+      <programlisting>log.Debug("Entering MyMethod");
+try {
+    if (!foo)
+        log.Warn("Foo is disabled, bla");
+    int result = DoSomething();
+    log.InfoFormat("Did something, result={0}", result);
+    if (result &lt; 0)
+        log.Error("Invalid foobar");
+} catch (Exception e) {
+    log.Fatal(e);
+}</programlisting>
+
+      <para>
+        For more information, read the <ulink
+          url="http://logging.apache.org/log4net/release/sdk/log4net.ILogMembers.html">API
+          documentation</ulink>.
+      </para>
+    </section>
+  </chapter>
+
+  <chapter id="scripts">
+    <title>Scripts</title>
+    <para>
+      SunUO consists of two parts: the core, and the scripts. Scripts
+      can be added at runtime, and may contain features like new item
+      types, commands, gumps. They are compiled when SunUO is
+      starting.
+    </para>
+    <para>
+      The RunUO base scripts are located in
+      <filename>./Scripts/</filename>. SunUO further supports to
+      organize additional scripts in "script libraries". The directory
+      structure below <filename>./local/src/NAME/</filename> contains
+      the scripts of the library "NAME". Binary script libraries are
+      loaded from <filename>./local/lib/NAME.dll</filename>.
+    </para>
+    <para>
+      Librares can be configured in
+      <filename>./etc/sunuo.xml</filename>, e.g.:
+    </para>
+    <programlisting>&lt;sunuo-config&gt;
+  &lt;libraries&gt;
+    &lt;library name="foo"&gt;
+      &lt;!-- configuration goes here --&gt;
+    &lt;/library&gt;
+  &lt;libraries&gt;
+&lt;/sunuo-config&gt;</programlisting>
+
+    <section id="why_script_libs">
+      <title>Why script libraries?</title>
+      <para>
+        Whether you use script libraries is a matter of taste. There
+        are good reasons for doing so:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            during script development, SunUO only compiles the
+            libraries which have been recently modified instead of
+            everything - which would be much slower
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            less memory is required for compilation
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            putting scripts from several authors into one directory
+            structure becomes a mess sooner or later
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            upgrading a single library to a new version is much
+            easier: delete old script library, unzip new library, done
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            every library can be compiled with its own set of compiler
+            flags, e.g. warning level
+          </para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section id="library_path">
+      <title>Library path</title>
+      <para>
+        You can specify an arbitrary path where SunUO should compile
+        sources from:
+      </para>
+      <programlisting>&lt;library name="foo"&gt;
+  &lt;path&gt;/opt/sunuo/src/foo&lt;/path&gt;
+&lt;/library&gt;</programlisting>
+    </section>
+
+    <section id="library_excludes">
+      <title>Excludes</title>
+    <programlisting>&lt;library name="foo"&gt;
+  &lt;ignore-source name="Bar.cs"/&gt;
+  &lt;ignore-type name="Blubb"/&gt;
+&lt;/library&gt;</programlisting>
+      <para>
+        This tells SunUO not to compile the file "Bar.cs", and to
+        ignore the type "Blubb". You can use this to disable commands
+        or to disable items in the game.
+      </para>
+    </section>
+
+    <section id="library_disable">
+      <title>Disabling a library</title>
+      <programlisting>&lt;library name="foo" disabled="true"/&gt;</programlisting>
+      <para>
+        SunUO ignores libraries marked disabled. By default, if no
+        explicit configuration is available, all libraries are
+        enabled.
+      </para>
+    </section>
+
+    <section id="library_deps">
+      <title>Dependencies</title>
+      <para>
+        In many cases, you want to use classes from another script
+        library, but for doing this, the other library has to be
+        loaded before the new library is compiled. To change the order
+        in which libraries are compiled and loaded, you may declare
+        library dependencies:
+      </para>
+      <programlisting>&lt;libraries&gt;
+  &lt;library name="bar"&gt;
+    &lt;depends name="foo"/&gt;
+  &lt;/library&gt;
+  &lt;library name="foo"&gt;
+  &lt;/library&gt;
+&lt;/libraries&gt;</programlisting>
+
+      <para>
+        This tells SunUO that "bar" imports classes from "foo", and that "foo"
+        has to be compiled and loaded first.
+      </para>
+
+      <para>
+        If you do not use the "&lt;depends/&gt;" element, libraries
+        are loaded in random order.
+      </para>
+    </section>
+
+    <section id="library_overlays">
+      <title>Overlays</title>
+      <para>
+        To configure RunUO, you need to edit the original RunUO
+        scripts (<filename>./Scripts/</filename>) often. However, for
+        easier upgrades, it is better to move edited files over to
+        another library and simply replace the files in
+        <filename>./Scripts/</filename> - this method is called
+        "overlay":
+      </para>
+      <programlisting>&lt;libraries&gt;
+  &lt;library name="legacy"&gt;
+    &lt;overlay name="bar"/&gt;
+  &lt;/library&gt;
+  &lt;library name="bar"/&gt;
+&lt;/libraries&gt;</programlisting>
+
+      <para>
+        Now you can edit the file
+        <filename>./local/src/bar/Misc/ServerList.cs</filename>, which
+        is then used instead of
+        <filename>./Scripts/Misc/ServerList.cs</filename>.
+      </para>
+      
+    </section>
+
+    <section id="compiler_warnings">
+      <title>Taming the warnings</title>
+      <para>
+        It is obvious that you should pay attention to compiler
+        warnings, as they may reveal bugs which are otherwise hard to
+        find. However, if you are using code from others which emits
+        lots of warnings and the author won't fix them, you might want
+        to disable compiler warnings:
+      </para>
+      <programlisting>&lt;library name="legacy" warn="0"/&gt;</programlisting>
+      <para>
+        According to the Mono MCS manual, the default warning level is
+        2, and 4 is the highest level.
+      </para>
+    </section>
+  </chapter>
+
+  <chapter id="troubleshooting">
+    <title>Troubleshooting</title>
+
+    <section id="getting_help">
+      <title>Getting help</title>
+      <para>
+        There is a <ulink
+        url="https://lists.berlios.de/mailman/listinfo/sunuo-users">mailing
+        list</ulink> for SunUO support.
+      </para>
+    </section>
+  </chapter>
+</book>

@@ -1,0 +1,96 @@
+Source: sunuo
+Section: games
+Priority: optional
+Maintainer: Max Kellermann <max@duempel.org>
+Standards-Version: 3.7.2
+Build-Depends: debhelper (>= 5), cli-common (>= 0.4.6), mono-mcs (>= 1.2.2), libmono-winforms1.0-cil, liblog4net1.2-cil (>= 1.2.8), xmlto (>= 0.0.18)
+
+Package: sunuo
+Architecture: all
+Depends: mono (>= 1.2.2), libgdiplus (>= 1.1.18),
+ liblog4net1.2-cil (>= 1.2.8),
+ ruby (>= 1.8), debconf (>= 1.4.30.13)
+Recommends: sunuo-skeleton, sunuo-scripts-legacy
+Suggests: sunuo-doc
+Replaces: sunuo-dbg
+Conflicts: sunuo-dbg
+Description: free Ultima Online server
+ SunUO is a free Ultima Online server, based on RunUO.
+ .
+ Home page: http://www.sunuo.org/
+
+Package: sunuo-skeleton
+Architecture: all
+Depends: sunuo (= ${Source-Version})
+Conflicts: runuo-skeleton
+Description: free Ultima Online server - basic data
+ SunUO is a free Ultima Online server, based on RunUO.
+ .
+ This package provides basic configuration data.
+ .
+ Home page: http://www.sunuo.org/
+
+Package: sunuo-scripts-legacy
+Architecture: all
+Depends: sunuo, libmono-system-web1.0-cil
+Suggests: sunuo-doc
+Description: free Ultima Online server - legacy scripts
+ SunUO is a free Ultima Online server, based on RunUO.
+ .
+ This package provides the base scripts.
+ .
+ Home page: http://www.sunuo.org/
+
+Package: sunuo-scripts-remote-admin
+Architecture: all
+Depends: sunuo, sunuo-scripts-legacy
+Suggests: sunuo-doc
+Description: free Ultima Online server - legacy scripts
+ SunUO is a free Ultima Online server, based on RunUO.
+ .
+ This package provides the remote admin engine.
+ .
+ Home page: http://www.sunuo.org/
+
+Package: sunuo-scripts-reports
+Architecture: all
+Depends: sunuo, libmono-system-web1.0-cil
+Suggests: sunuo-doc
+Description: free Ultima Online server - legacy scripts
+ SunUO is a free Ultima Online server, based on RunUO.
+ .
+ This package provides the reports engine.
+ .
+ Home page: http://www.sunuo.org/
+
+Package: sunuo-scripts-myrunuo
+Architecture: all
+Depends: sunuo
+Suggests: sunuo-doc
+Description: free Ultima Online server - legacy scripts
+ SunUO is a free Ultima Online server, based on RunUO.
+ .
+ This package provides the MyRunUO engine.
+ .
+ Home page: http://www.sunuo.org/
+
+Package: sunuo-scripts-profiler
+Architecture: all
+Depends: sunuo
+Suggests: sunuo-doc
+Description: free Ultima Online server - legacy scripts
+ SunUO is a free Ultima Online server, based on RunUO.
+ .
+ This package provides the profiler gump.
+ .
+ Home page: http://www.sunuo.org/
+
+Package: sunuo-doc
+Section: doc
+Architecture: all
+Description: free Ultima Online server
+ SunUO is a free Ultima Online server, based on RunUO.
+ .
+ This package contains documentation.
+ .
+ Home page: http://www.sunuo.org/
